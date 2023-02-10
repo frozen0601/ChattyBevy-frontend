@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useContext, Link } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
-import { BrowserRouter as Router, Route, useHistory } from "react-router-dom";
-import ChatPage from "./ChatPage";
-import Header from "../components/Header";
-import { AuthProvider } from "../context/AuthContext";
-import props from "prop-types";
+import { useHistory } from "react-router-dom";
 
 const HomePage = () => {
   let [rooms, setRooms] = useState([]);
@@ -35,7 +31,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <p>You are logged to the home page!</p>
+      <p>Welcome to the home page :)</p>
       <ul>
         {rooms.map(
           (room) =>

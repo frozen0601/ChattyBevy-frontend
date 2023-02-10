@@ -54,17 +54,20 @@ export const AuthProvider = ({ children }) => {
 
   let registerUser = async (e) => {
     e.preventDefault();
-    let response = await fetch("http://127.0.0.1:8000/rest-auth/registration/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: e.target.username.value,
-        password1: e.target.password1.value,
-        password2: e.target.password2.value,
-      }),
-    });
+    let response = await fetch(
+      "http://127.0.0.1:8000/rest-auth/registration/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: e.target.username.value,
+          password1: e.target.password1.value,
+          password2: e.target.password2.value,
+        }),
+      }
+    );
     let data = await response.json();
 
     if (response.status === 200) {
@@ -112,7 +115,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (loading) {
       updateToken();
-      console.log('token updated')
+      console.log("token updated");
     }
 
     let fourMinutes = 1000 * 60 * 4;
