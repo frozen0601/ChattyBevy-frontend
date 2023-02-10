@@ -1,20 +1,28 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
 const Header = () => {
+  const history = useHistory();
   let { user, logoutUser } = useContext(AuthContext);
   return (
     <div>
-      <button to="/">Home</button>
-      <span> | </span>
       {user ? (
-        <button onClick={logoutUser}>Logout</button>
+        <>
+          <button onClick={() => history.push("/")}>Home</button>
+          <span> | </span>
+          <button onClick={logoutUser}>Logout</button>
+        </>
       ) : (
-        <button to="/login">Login</button>
+        <>
+          <button to="/">Home</button>
+          <span> | </span>
+          <button onClick={() => history.push("/login")}>Login</button>
+        </>
       )}
-      <p>Hello!</p>
-      {console.log(user)}
+      <span> | </span>
+      <button onClick={() => history.push("/register")}>Register</button>
+
       {user && <p>Hello {user.username}</p>}
     </div>
   );

@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authTokens", JSON.stringify(data));
       history.push("/");
     } else {
-      alert("Something went wrong!");
+      alert("Login error!");
     }
   };
 
@@ -50,6 +50,31 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("authTokens");
     history.push("/login");
+  };
+
+  let registerUser = async (e) => {
+    e.preventDefault();
+    let response = await fetch("http://127.0.0.1:8000/rest-auth/registration/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: e.target.username.value,
+        password1: e.target.password1.value,
+        password2: e.target.password2.value,
+      }),
+    });
+    let data = await response.json();
+
+    if (response.status === 200) {
+      setAuthTokens(data);
+      setUser(jwt_decode(data.access));
+      localStorage.setItem("authTokens", JSON.stringify(data));
+      history.push("/");
+    } else {
+      alert("Registration failed");
+    }
   };
 
   let updateToken = async () => {
@@ -81,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     authTokens: authTokens,
     loginUser: loginUser,
     logoutUser: logoutUser,
+    registerUser: registerUser,
   };
 
   useEffect(() => {
@@ -89,13 +115,13 @@ export const AuthProvider = ({ children }) => {
       console.log('token updated')
     }
 
-    let fiveMinutes = 1000 * 60 * 5;
+    let fourMinutes = 1000 * 60 * 4;
 
     let interval = setInterval(() => {
       if (authTokens) {
         updateToken();
       }
-    }, fiveMinutes);
+    }, fourMinutes);
     return () => clearInterval(interval);
   }, [authTokens, loading]);
 
