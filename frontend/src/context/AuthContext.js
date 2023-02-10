@@ -70,11 +70,8 @@ export const AuthProvider = ({ children }) => {
     );
     let data = await response.json();
 
-    if (response.status === 200) {
-      setAuthTokens(data);
-      setUser(jwt_decode(data.access));
-      localStorage.setItem("authTokens", JSON.stringify(data));
-      history.push("/");
+    if (response.status === 201) {
+      history.push("/login");
     } else {
       alert("Registration failed");
     }
