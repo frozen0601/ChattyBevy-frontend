@@ -68,7 +68,6 @@ export const AuthProvider = ({ children }) => {
         }),
       }
     );
-    let data = await response.json();
 
     if (response.status === 201) {
       history.push("/login");
