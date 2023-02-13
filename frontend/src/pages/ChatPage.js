@@ -85,7 +85,8 @@ const ChatPage = () => {
           </p>
         ))}
       </ul>
-
+      <hr />
+      <button onClick={() => history.push("/compose")}>Compose Message</button>
       <ScrollToBottom />
     </div>
   );
