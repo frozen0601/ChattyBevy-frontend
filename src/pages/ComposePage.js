@@ -1,86 +1,93 @@
 import React, { useState, useContext } from "react";
-import { useHistory } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-const messageBoxStyle = {
-  color: "black",
-  backgroundColor: "Cyan",
-};
 
-const ComposePage = () => {
-  let [sender, setSender] = useState("");
+const ComposePage = ({ closeModal }) => {
   const [recipient, setRecipient] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isPending, setIsPending] = useState(false);
-  const history = useHistory();
-  let [messages, setMessages] = useState([]);
-  let { user, authTokens, logoutUser } = useContext(AuthContext);
-  sender = user.username;
+  const { user, authTokens } = useContext(AuthContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const message = { sender, recipient, title, body };
-
     setIsPending(true);
-    fetch("http://127.0.0.1:8000/messaging/room/1/message/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "JWT " + String(authTokens.access),
-      },
-      body: JSON.stringify(message),
-    }).then(() => {
-      console.log("new message added.");
+
+    const message = {
+      sender: user.username,
+      recipient,
+      title,
+      body,
+    };
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/messaging/room/1/message/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${authTokens.access}`,
+          },
+          body: JSON.stringify(message),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
       setIsPending(false);
-      history.go(-1)
-    });
+      closeModal(); // close the modal after the message is sent
+    } catch (error) {
+      console.error(error);
+      setIsPending(false);
+    }
   };
 
   return (
     <div>
-      <p>You are now in the compose page!</p>
-      <p>{messages}</p>
-      <form onSubmit={handleSubmit}>
-        <hr />
-        <label for="sender">Sender:</label>
-        <p id="sender" name="sender" value={user.username}>
-          {user.username}
-        </p>
-        <hr />
-        <label for="recepient">Recepient: </label>
-        <br />
-        <input
-          id="recepient"
-          name="recepient"
-          type="input"
-          required
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-        />
-        <hr />
-        <label for="title">Title: </label>
-        <br />
-        <input
-          id="title"
-          name="title"
-          type="input"
-          required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <hr />
-        <label for="body">Body: </label>
-        <br />
-        <textarea
-          id="body"
-          name="body"
-          type="textarea"
-          rows="20"
-          cols="100"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
-        <br />
+      <div className="page-title-container"></div>
+      <form onSubmit={handleSubmit} className="form-container">
+        <div className="form-row">
+          <label htmlFor="sender">Send by:</label>
+          <span id="sender">{user.username}</span>
+        </div>
+        <div className="form-row">
+          <label htmlFor="recipient">Send to:</label>
+          <input
+            id="recipient"
+            name="recipient"
+            type="text"
+            required
+            value={recipient}
+            placeholder="Enter Recipient"
+            onChange={(e) => setRecipient(e.target.value)}
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="title">Title:</label>
+          <input
+            id="title"
+            name="title"
+            type="input"
+            required
+            value={title}
+            placeholder="Enter Title"
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="body">Body:</label>
+          <textarea
+            id="body"
+            name="body"
+            type="textarea"
+            rows="15"
+            cols="60"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+        </div>
         {!isPending && (
           <button id="compose_button" type="submit" value="submit">
             Compose

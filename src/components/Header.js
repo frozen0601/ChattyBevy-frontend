@@ -1,29 +1,30 @@
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import Button from "@mui/material/Button";
 
 const Header = () => {
   const history = useHistory();
   let { user, logoutUser } = useContext(AuthContext);
   return (
-    <div>
+    <div className="header_div">
       {user ? (
         <>
-          <button onClick={() => history.push("/")}>Home</button>
+          <Button onClick={() => history.push("/")}>Home</Button>
           <span> | </span>
-          <button onClick={logoutUser}>Logout</button>
+          <Button onClick={logoutUser}>Logout</Button>
         </>
       ) : (
         <>
-          <button to="/">Home</button>
+          <Button to="/">Home</Button>
           <span> | </span>
-          <button onClick={() => history.push("/login")}>Login</button>
+          <Button onClick={() => history.push("/login")}>Login</Button>
         </>
       )}
       <span> | </span>
-      <button onClick={() => history.push("/register")}>Register</button>
-
-      {user && <p>Hello {user.username}</p>}
+      <Button onClick={() => history.push("/register")}>Register</Button>
+        <br/>
+      {user && <span>Hello, {user.username}</span>}
     </div>
   );
 };

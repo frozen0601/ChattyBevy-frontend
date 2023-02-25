@@ -1,93 +1,114 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
+import { useLocation } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-const messageBoxStyle = {
-  color: "black",
-  backgroundColor: "Cyan",
-};
-
-function ScrollToBottom() {
-  const elementRef = useRef();
-  useEffect(() => elementRef.current.scrollIntoView());
-  return <div ref={elementRef} />;
-}
+import ComposeButton from "../components/ComposeButton";
 
 const ChatPage = () => {
-  let [messages, setMessages] = useState([]);
-  let { authTokens, logoutUser } = useContext(AuthContext);
-  const history = useHistory();
-  useEffect(() => {
-    getMessages();
-  }, []);
-
-  function deleteMessage(messageID) {
-    fetch("http://127.0.0.1:8000/messaging/room/1/message/" + messageID + "/", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "JWT " + String(authTokens.access),
-      },
-      body: "",
-    }).then(() => {
-      console.log("message deleted.");
-      window.location.reload(false);
-    });
-  }
-
+  const [messages, setMessages] = useState([]);
+  const { authTokens, logoutUser } = useContext(AuthContext);
   const location = useLocation();
-  let roomID = location.state.room_id;
-  let getMessages = async () => {
-    let response = await fetch(
-      "http://127.0.0.1:8000/messaging/room/" + roomID,
-      {
-        // + this.props.match.params.id
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "JWT " + String(authTokens.access),
-        },
+  const roomID = location.state?.room_id;
+  const { user } = useContext(AuthContext);
+  const messageListRef = useRef(null);
+
+  const getMessages = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/messaging/room/${roomID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${authTokens.access}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        // Set the messages state variable
+        setMessages(data);
+      } else {
+        logoutUser();
       }
-    );
-    let data = await response.json();
-
-    if (response.status === 200) {
-      setMessages(data);
-    } else if (response.statusText === "Unauthorized") {
-      logoutUser();
+    } catch (error) {
+      console.error(error);
     }
-  };
+  }, [roomID, authTokens.access, logoutUser]);
 
+  const deleteMessage = async (messageID) => {
+    try {
+      await fetch(
+        `http://127.0.0.1:8000/messaging/room/1/message/${messageID}/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${authTokens.access}`,
+          },
+        }
+      );
+      console.log("message deleted.");
+    } catch (error) {
+      console.error(error);
+    }
+
+    // Fetch new messages after a message is deleted
+    getMessages();
+  };
+  useEffect(() => {
+    if (roomID) {
+      getMessages();
+    }
+
+    // Set up a timer to fetch new messages every 5 seconds
+    const interval = setInterval(() => {
+      if (roomID) {
+        getMessages();
+      }
+    }, 1000);
+
+    // Clean up the timer when the component unmounts
+    return () => clearInterval(interval);
+  }, [roomID, getMessages]);
   return (
     <div>
-      <p>You are now in the chat page!</p>
+      {messages.length > 0 && <ComposeButton />}
       <ul>
         {messages.map((message) => (
-          <p key={message.id}>
-            <div style={messageBoxStyle}>
-              Sender: {message.sender}
+          <li key={message.id}>
+            <div className="message_box">
+              <span>From: {message.sender}</span>
               <br />
-              Recipient: {message.recipient}
+              <span>To: {message.recipient}</span>
               <br />
-              Title: {message.title}
+              <span>
+                <strong>Title:</strong> {message.title}
+              </span>
               <br />
-              Body: {message.body}
+              <span className="message_date_time">{message.created_at}</span>
+              <hr />
+              <span className="message_body">{message.body}</span>
               <br />
-              Timestamp: {message.created_at}
+              {user.username === message.sender && (
+                <button
+                  style={{ backgroundColor: "red", marginRight: "10px" }}
+                  onClick={() => deleteMessage(message.id)}
+                >
+                  Delete
+                </button>
+              )}
             </div>
-            <button
-              style={{ backgroundColor: "orange" }}
-              onClick={() => deleteMessage(message.id)}
-            >
-              Delete Message
-            </button>
-            <br />
-            <br />
-          </p>
+          </li>
         ))}
+        <li ref={messageListRef}></li>
       </ul>
-      <hr />
-      <button onClick={() => history.push("/compose")}>Compose Message</button>
-      <ScrollToBottom />
     </div>
   );
 };

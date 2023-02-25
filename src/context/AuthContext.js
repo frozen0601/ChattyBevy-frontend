@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import jwt_decode from "jwt-decode";
 import { useHistory } from "react-router-dom";
 
@@ -45,12 +45,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  let logoutUser = () => {
+  let logoutUser = useCallback(() => {
     setAuthTokens(null);
     setUser(null);
     localStorage.removeItem("authTokens");
     history.push("/login");
-  };
+  }, [history]);
 
   let registerUser = async (e) => {
     e.preventDefault();
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  let updateToken = async () => {
+  let updateToken = useCallback(async () => {
     let response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
       method: "POST",
       headers: {
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
     if (loading) {
       setLoading(false);
     }
-  };
+  }, [authTokens, loading, logoutUser, setAuthTokens, setUser]);
 
   let contextData = {
     user: user,
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       }
     }, fourMinutes);
     return () => clearInterval(interval);
-  }, [authTokens, loading]);
+  }, [authTokens, loading, updateToken]);
 
   return (
     <AuthContext.Provider value={contextData}>
