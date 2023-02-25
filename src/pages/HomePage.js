@@ -3,6 +3,7 @@ import AuthContext from "../context/AuthContext";
 import { useHistory } from "react-router-dom";
 import Button from "@mui/material/Button";
 import ComposeButton from "../components/ComposeButton";
+import { handleError } from '../components/ErrorHandler';
 
 const HomePage = () => {
   const [rooms, setRooms] = useState([]);
@@ -12,25 +13,34 @@ const HomePage = () => {
 
   useEffect(() => {
     const getRooms = async () => {
-      const response = await fetch("http://127.0.0.1:8000/messaging/room/", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authTokens.access ? `JWT ${authTokens.access}` : null,
-        },
-      });
+      try {
+        const response = await fetch("http://127.0.0.1:8000/messaging/room/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authTokens.access
+              ? `JWT ${authTokens.access}`
+              : null,
+          },
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      console.log(user.username);
-      console.log(authTokens.access);
+        console.log(user.username);
+        console.log(authTokens.access);
 
-      if (response.status === 200) {
-        setRooms(data.results);
-      } else if (response.statusText === "Unauthorized") {
-        logoutUser();
+        if (response.status === 200) {
+          setRooms(data.results);
+        } else if (response.statusText === "Unauthorized") {
+          logoutUser();
+        } else {
+          handleError(response);
+        }
+      } catch (error) {
+        console.log(error);
+        handleError({ details: "Failed to fetch rooms." });
       }
-      
+
       setLoading(false); // Set loading state to false
     };
     getRooms();
@@ -65,7 +75,8 @@ const HomePage = () => {
           ) : null;
         })}
       </ul>
-      {!loading && <ComposeButton />} {/* Show ComposeButton only when loading is false */}
+      {!loading && <ComposeButton />}{" "}
+      {/* Show ComposeButton only when loading is false */}
     </div>
   );
 };

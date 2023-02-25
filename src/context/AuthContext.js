@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import jwt_decode from "jwt-decode";
 import { useHistory } from "react-router-dom";
+import { handleError } from "../components/ErrorHandler";
 
 const AuthContext = createContext();
 
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }) => {
         password: e.target.password.value,
       }),
     });
+
     let data = await response.json();
 
     if (response.status === 200) {
@@ -41,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authTokens", JSON.stringify(data));
       history.push("/");
     } else {
-      alert("Login error!");
+      alert("loggin failed");
     }
   };
 
@@ -72,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     if (response.status === 201) {
       history.push("/login");
     } else {
-      alert("Registration failed");
+      handleError(response);
     }
   };
 
@@ -93,6 +95,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authTokens", JSON.stringify(data));
     } else {
       logoutUser();
+      alert("errorMessages.join('\n')");
     }
 
     if (loading) {

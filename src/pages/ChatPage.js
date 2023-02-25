@@ -8,6 +8,7 @@ import React, {
 import { useLocation } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import ComposeButton from "../components/ComposeButton";
+import { handleError } from "../components/ErrorHandler";
 
 const ChatPage = () => {
   const [loading, setLoading] = useState(true); // Add loading state
@@ -37,6 +38,7 @@ const ChatPage = () => {
         setMessages(data);
       } else {
         logoutUser();
+        handleError(response);
       }
       setLoading(false); // Set loading state to false
     } catch (error) {
@@ -52,7 +54,9 @@ const ChatPage = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: authTokens.access ? `JWT ${authTokens.access}` : null,
+            Authorization: authTokens.access
+              ? `JWT ${authTokens.access}`
+              : null,
           },
         }
       );

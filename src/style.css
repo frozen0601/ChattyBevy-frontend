@@ -3,8 +3,8 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
+  justify-content: top;
+  height: 80vh;
 }
 
 input {
@@ -41,10 +41,10 @@ button {
   background-color: #2480eb;
   color: white;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 button:hover {
@@ -123,6 +123,12 @@ button[style*="background-color: red"]:hover {
 
 .header_div {
   text-align: center;
+  background-color: white;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 1% 10%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
 }
 .inbox_div {
   text-align: center;
@@ -174,3 +180,9 @@ label {
   z-index: 1000;
 }
 
+/* .activeButton {
+} */
+
+.inactiveButton {
+    background-color: gray;
+}

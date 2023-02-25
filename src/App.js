@@ -3,11 +3,10 @@ import "./App.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import CssBaseline from "@mui/material/CssBaseline";
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -28,7 +27,6 @@ function App() {
               name="viewport"
               content="initial-scale=1, width=device-width"
             />
-            <hr />
             <Route component={HomePage} path="/" exact />
             <Route component={LoginPage} path="/login" />
             <Route component={ChatPage} path="/chat" />

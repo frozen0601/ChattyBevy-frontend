@@ -1,29 +1,49 @@
 import React, { useContext } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-import Button from "@mui/material/Button";
 
 const Header = () => {
   const history = useHistory();
+  const location = useLocation();
+  const isActive = (path) => {
+    return location.pathname === path ? "activeButton" : "inactiveButton";
+  };
+
   let { user, logoutUser } = useContext(AuthContext);
   return (
     <div className="header_div">
       {user ? (
         <>
-          <Button onClick={() => history.push("/")}>Home</Button>
-          <span> | </span>
-          <Button onClick={logoutUser}>Logout</Button>
+          <button className={isActive("/")} onClick={() => history.push("/")}>
+            Home
+          </button>
+          <span> </span>
+          <button className={isActive("/register")} onClick={logoutUser}>
+            Logout
+          </button>
         </>
       ) : (
         <>
-          <Button to="/">Home</Button>
-          <span> | </span>
-          <Button onClick={() => history.push("/login")}>Login</Button>
+          <button className={isActive("")} to="/">
+            Home
+          </button>
+          <span> </span>
+          <button
+            className={isActive("/login")}
+            onClick={() => history.push("/login")}
+          >
+            Login
+          </button>
         </>
       )}
-      <span> | </span>
-      <Button onClick={() => history.push("/register")}>Register</Button>
-        <br/>
+      <span> </span>
+      <button
+        className={isActive("/register")}
+        onClick={() => history.push("/register")}
+      >
+        Register
+      </button>
+      <br />
       {user && <span>Hello, {user.username}</span>}
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import { handleError } from "../components/ErrorHandler";
 
 const ComposePage = ({ closeModal }) => {
   const [recipient, setRecipient] = useState("");
@@ -33,7 +34,8 @@ const ComposePage = ({ closeModal }) => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        handleError(response);
+        
       }
 
       setIsPending(false);
@@ -82,6 +84,7 @@ const ComposePage = ({ closeModal }) => {
             id="body"
             name="body"
             type="textarea"
+            required
             rows="15"
             cols="60"
             value={body}
