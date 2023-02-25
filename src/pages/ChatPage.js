@@ -10,6 +10,7 @@ import AuthContext from "../context/AuthContext";
 import ComposeButton from "../components/ComposeButton";
 
 const ChatPage = () => {
+  const [loading, setLoading] = useState(true); // Add loading state
   const [messages, setMessages] = useState([]);
   const { authTokens, logoutUser } = useContext(AuthContext);
   const location = useLocation();
@@ -37,6 +38,7 @@ const ChatPage = () => {
       } else {
         logoutUser();
       }
+      setLoading(false); // Set loading state to false
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +52,7 @@ const ChatPage = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `JWT ${authTokens.access}`,
+            Authorization: authTokens.access ? `JWT ${authTokens.access}` : null,
           },
         }
       );
@@ -79,7 +81,7 @@ const ChatPage = () => {
   }, [roomID, getMessages]);
   return (
     <div>
-      {messages.length > 0 && <ComposeButton />}
+      {!loading && <ComposeButton />}
       <ul>
         {messages.map((message) => (
           <li key={message.id}>

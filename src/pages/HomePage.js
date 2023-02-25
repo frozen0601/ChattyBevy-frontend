@@ -6,6 +6,7 @@ import ComposeButton from "../components/ComposeButton";
 
 const HomePage = () => {
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
   const { user, authTokens, logoutUser } = useContext(AuthContext);
   const history = useHistory();
 
@@ -15,7 +16,7 @@ const HomePage = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `JWT ${authTokens.access}`,
+          Authorization: authTokens.access ? `JWT ${authTokens.access}` : null,
         },
       });
 
@@ -29,8 +30,16 @@ const HomePage = () => {
       } else if (response.statusText === "Unauthorized") {
         logoutUser();
       }
+      
+      setLoading(false); // Set loading state to false
     };
     getRooms();
+
+    const interval = setInterval(() => {
+      getRooms();
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, [authTokens.access, user.username, logoutUser]);
 
   return (
@@ -56,7 +65,7 @@ const HomePage = () => {
           ) : null;
         })}
       </ul>
-      {rooms.length > 0 && <ComposeButton />}
+      {!loading && <ComposeButton />} {/* Show ComposeButton only when loading is false */}
     </div>
   );
 };

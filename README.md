@@ -1,6 +1,6 @@
 # ChattyBevy-frontend
 
-A Front End for a Coding Test Project.
+A Front End for a Back End Coding Test Project - written in React.
 
 ## Setup and Run
 

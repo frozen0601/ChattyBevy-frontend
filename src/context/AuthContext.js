@@ -114,13 +114,13 @@ export const AuthProvider = ({ children }) => {
       console.log("token updated");
     }
 
-    let fourMinutes = 1000 * 60 * 4;
+    let fifteenMinutes = 1000 * 60 * 15;
 
     let interval = setInterval(() => {
       if (authTokens) {
         updateToken();
       }
-    }, fourMinutes);
+    }, fifteenMinutes);
     return () => clearInterval(interval);
   }, [authTokens, loading, updateToken]);
 
