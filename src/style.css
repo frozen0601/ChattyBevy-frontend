@@ -84,7 +84,7 @@ button[style*="background-color: red"]:hover {
 }
 
 .compose_button {
-  width: 80%;
+  width: 150px;
   margin: auto;
   padding: 1rem;
   background-color: black;
@@ -185,4 +185,9 @@ label {
 
 .inactiveButton {
     background-color: gray;
+}
+
+.chat-container {
+  overflow-y: scroll;
+  height: calc(100vh - 120px); /* 120px is the height of the App-header and the donuts section */
 }

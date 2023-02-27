@@ -18,7 +18,7 @@ const Header = () => {
             Home
           </button>
           <span> </span>
-          <button className={isActive("/register")} onClick={logoutUser}>
+          <button className="inactiveButton" onClick={logoutUser}>
             Logout
           </button>
         </>

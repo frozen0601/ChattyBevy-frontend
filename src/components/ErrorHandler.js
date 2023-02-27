@@ -1,6 +1,5 @@
-export const handleError = async (response) => {
-  if (!response.bodyUsed) {
-    const errorData = await response.json();
+export function handleError(response) {
+  response.json().then((errorData) => {
     let details = errorData.error.details;
     let errorMessages = [];
 
@@ -12,7 +11,7 @@ export const handleError = async (response) => {
           searchForErrors(obj[key]);
         }
       }
-    }
+    };
 
     searchForErrors(details);
 
@@ -21,7 +20,5 @@ export const handleError = async (response) => {
     } else {
       console.error('No error messages found in response.');
     }
-  } else {
-    console.error('Response body has already been used.');
-  }
-};
+  });
+}

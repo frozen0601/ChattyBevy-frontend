@@ -18,9 +18,14 @@ const ChatPage = () => {
   const roomID = location.state?.room_id;
   const { user } = useContext(AuthContext);
   const messageListRef = useRef(null);
+  const hasVisitedRef = useRef(false);
 
   const getMessages = useCallback(async () => {
     try {
+      if (!authTokens || !roomID) {
+        return;
+      }
+
       const response = await fetch(
         `http://127.0.0.1:8000/messaging/room/${roomID}`,
         {
@@ -36,6 +41,9 @@ const ChatPage = () => {
       if (response.ok) {
         // Set the messages state variable
         setMessages(data);
+        if (!hasVisitedRef.current) {
+          hasVisitedRef.current = true;
+        }
       } else {
         logoutUser();
         handleError(response);
@@ -44,7 +52,7 @@ const ChatPage = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [roomID, authTokens.access, logoutUser]);
+  }, [roomID, authTokens, logoutUser]);
 
   const deleteMessage = async (messageID) => {
     try {
@@ -73,19 +81,24 @@ const ChatPage = () => {
       getMessages();
     }
 
-    // Set up a timer to fetch new messages every 5 seconds
     const interval = setInterval(() => {
       if (roomID) {
         getMessages();
       }
-    }, 1000);
+    }, 3000);
 
     // Clean up the timer when the component unmounts
     return () => clearInterval(interval);
   }, [roomID, getMessages]);
+
+  useEffect(() => {
+    if (hasVisitedRef.current && messageListRef.current) {
+      messageListRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [hasVisitedRef.current]);
+
   return (
-    <div>
-      {!loading && <ComposeButton />}
+    <div className="chat-container">
       <ul>
         {messages.map((message) => (
           <li key={message.id}>
@@ -102,19 +115,24 @@ const ChatPage = () => {
               <hr />
               <span className="message_body">{message.body}</span>
               <br />
-              {user.username === message.sender && (
-                <button
-                  style={{ backgroundColor: "red", marginRight: "10px" }}
-                  onClick={() => deleteMessage(message.id)}
-                >
-                  Delete
-                </button>
+              {user && (
+                <>
+                  {user.username === message.sender && (
+                    <button
+                      style={{ backgroundColor: "red", marginRight: "10px" }}
+                      onClick={() => deleteMessage(message.id)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </li>
         ))}
         <li ref={messageListRef}></li>
       </ul>
+      {!loading && <ComposeButton />}
     </div>
   );
 };
